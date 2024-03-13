@@ -157,7 +157,9 @@ std::deque<std::pair<int, int>> findWay(int startX, int startY, int finishX, int
     gen.push_back(new Step(startX, startY, nullptr));
     generations.push_back(gen);
 
-    while (true) {
+    int steps = 0;
+
+    while (steps < 2000) {
         std::vector<Step*> tempGen;
         for(auto i : generations.back()) {
             for(int j = 0; j < 4; j++) {
@@ -168,9 +170,16 @@ std::deque<std::pair<int, int>> findWay(int startX, int startY, int finishX, int
                 for(auto j : tempGen) {
                     if(newPosX == j->posX && newPosY == j->posY) visitedByOtherStepThisGeneration = true;
                 }
+                bool visitedByOtherStepPreviousGeneration = false;
+                for(auto j : generations) {
+                    for(auto k : j) {
+                        if(newPosX == k->posX && newPosY == k->posY) visitedByOtherStepThisGeneration = true;
+                    }
+                }
 
-                if(!detectCollision(newPosX,newPosY) && checkAncestors(i) && !visitedByOtherStepThisGeneration) {
+                if(!detectCollision(newPosX,newPosY) && !visitedByOtherStepPreviousGeneration && !visitedByOtherStepThisGeneration) {
                     tempGen.push_back(new Step(newPosX, newPosY, i));
+                    steps++;
                     if(stepcnt % 100 == 0) std::cout << stepcnt << std::endl;;
                     if(tempGen.back()->posX == finishX && tempGen.back()->posY == finishY) {
                         correctPath = tempGen.back();
@@ -205,7 +214,7 @@ int main() {
 
     std::deque<std::pair<int, int>> deque;
 
-    deque = findWay(0, 0, 9, 99);
+    deque = findWay(0, 0, 4, 99);
 
     for(auto i : deque) {
         std::cout << "X: " << i.first << " Y: " << i.second << std::endl;
